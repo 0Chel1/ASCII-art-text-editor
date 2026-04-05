@@ -1,0 +1,36 @@
+Building system
+To build a building, you need to write it. Resources for building will be spent as a percentage of each building symbol. For example, 200 copper is needed for construction, and there are 8 symbols in it. It calculates how many resources are needed for 1 symbol, if 8 is 100%, then how many percent is 1 symbol.
+Here are the main buildings:
+Conveys
+They will deliver resources to the storage cores. When a resource passes through the conveyor, the arrow on the conveyor is replaced by the resource symbol.
+< - left, ^ - up, > - right, v - down
+Storage Core
+Convoys should lead into it in order to save the extracted resources.
+###
+#0#
+###
+Drill
+The drill extracts resources and, if possible, uploads them to the pipeline.
+ox
+xo
+The turret
+The turret accepts projectiles and shoots at enemies.
+[!]
+[#]
+[8]
+The Shell Factory
+The shell factory builds shells for the turret.
+@$
+$@
+
+Resources
+Resources can be extracted from various sources. They can be either hidden underground or lying on the surface. All resources are loaded into the storage cores.
+
+Maps
+There is only one map and it is pre-built. I wanted to make a small game and didn't want to make a lot of maps.
+
+Enemies
+Enemies will appear from time to time from the edges of the map. They will come in waves. There will be several zones of their occurrence, and each wave they will randomly appear on one of them.
+
+The goal of the game
+The goal of the game is to build a launch pad for a rocket. To do this, you need to extract resources and load them into storage cores.
