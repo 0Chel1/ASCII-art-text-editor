@@ -1,2 +1,2 @@
-﻿using var game = new IDEOS.Game1();
+﻿using var game = new IDEOS.MainProg();
 game.Run();

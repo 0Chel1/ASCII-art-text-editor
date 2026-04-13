@@ -301,11 +301,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Артур\\Desktop\\IDE-Defender-need-a-cool-name-\\IDE-Defender-need-a-cool-name-\\IDEOS.csproj",
+      "projectUniqueName": "C:\\Users\\Артур\\Desktop\\ASCII-art-text-editor\\IDEOS.csproj",
       "projectName": "IDEOS",
-      "projectPath": "C:\\Users\\Артур\\Desktop\\IDE-Defender-need-a-cool-name-\\IDE-Defender-need-a-cool-name-\\IDEOS.csproj",
+      "projectPath": "C:\\Users\\Артур\\Desktop\\ASCII-art-text-editor\\IDEOS.csproj",
       "packagesPath": "C:\\Users\\Артур\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Артур\\Desktop\\IDE-Defender-need-a-cool-name-\\IDE-Defender-need-a-cool-name-\\obj\\",
+      "outputPath": "C:\\Users\\Артур\\Desktop\\ASCII-art-text-editor\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

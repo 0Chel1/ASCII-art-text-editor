@@ -11,21 +11,21 @@ using System.Text;
 
 namespace IDEOS;
 
-public class Game1 : Core
+public class MainProg : Core
 {
-    //Behold, the messy code. I relly like compact code.
     private SpriteFont font;
-    public int currentLine = 4, maxLines = 9, maxCharacters = 91;
-    int cursorPositions = 0, currentCharPosInLine = 0;
-    StringBuilder[] map = Enumerable.Range(0, 9).Select(_ => new StringBuilder("")).ToArray();
+    public int currentLine = 0, maxLines = 22, maxCharacters = 91;
+    int cursorPosition = 0;
+    StringBuilder[] map;
     public List<Structure> availableStructures = new List<Structure>();
     public List<ActiveMatch> activeMatches = new List<ActiveMatch>();
     public List<CompletedBuilding> completedBuildings = new List<CompletedBuilding>();
+    public List<ColoredLines> coloredLines = new List<ColoredLines>();
     public BuildingSystem buildingSys = new BuildingSystem();
-    bool cursorVisible = true;
+    public bool cursorVisible = true, pushWhiteSpaces = false;
     float cursorTimer = 0f, waitBeforeFastErase = 0f, eraseInterval = 0f;
 
-    public Game1() : base("IDEOS", 1280, 720, false)
+    public MainProg() : base("ASCII art editor", 1280, 720, false)
     {
         IsMouseVisible = true;
         Window.TextInput += TextInputHandler;
@@ -33,6 +33,9 @@ public class Game1 : Core
 
     protected override void Initialize()
     {
+        map = Enumerable.Range(0, maxLines).Select(_ => new StringBuilder("")).ToArray();
+        currentLine = maxLines / 2;
+        cursorPosition = maxCharacters / 2;
         base.Initialize();
     }
 
@@ -44,14 +47,31 @@ public class Game1 : Core
 
         availableStructures.Add(new Structure
         {
-            Lines = new[] { "xo", "ox" },
-            color = Color.LimeGreen
+            Lines = new[] { ".c" }
         });
 
         availableStructures.Add(new Structure
         {
-            Lines = new[] { "###", "#0#", "###" },
-            color = Color.Orange
+            Lines = new[] { ".push" }
+        });
+
+        availableStructures.Add(new Structure
+        {
+            Lines = new[] { ".s" }
+        });
+
+        availableStructures.Add(new Structure
+        {
+            Lines = new[] { "special attack" },
+            color = Color.Blue,
+            Font = font
+        });
+
+        availableStructures.Add(new Structure
+        {
+            Lines = new[] { "xo", "ox" },
+            color = Color.LimeGreen,
+            Font = font
         });
     }
 
@@ -61,20 +81,35 @@ public class Game1 : Core
         if (cursorTimer >= 0.5f)
         {
             cursorVisible = !cursorVisible;
+            foreach(var building in completedBuildings.ToList())
+            {
+                if (map[building.StartLine].ToString().Substring(building.StartColumn, availableStructures[building.StructureIndex].Lines[0].Length).All(c => char.IsWhiteSpace(c)))
+                {
+                    completedBuildings.Remove(building);
+                }
+            }
+
+            for(int i = 0; i < coloredLines.Count; i++)
+            {
+                if (map[coloredLines[i].StartLine].ToString().Substring(coloredLines[i].StartColumn, coloredLines[i].Line.Length).All(c => char.IsWhiteSpace(c)))
+                {
+                    coloredLines.Remove(coloredLines[i]);
+                }
+            }
             cursorTimer = 0f;
         }
-        if (Input.Keyboard.WasKeyJustPressed(Keys.Left)) cursorPositions = Math.Max(0, cursorPositions - 1);
-        if (Input.Keyboard.WasKeyJustPressed(Keys.Right)) cursorPositions = Math.Min(map[currentLine].Length, cursorPositions + 1);
+        if (Input.Keyboard.WasKeyJustPressed(Keys.Left)) cursorPosition = Math.Max(0, cursorPosition - 1);
+        if (Input.Keyboard.WasKeyJustPressed(Keys.Right)) cursorPosition = Math.Min(map[currentLine].Length, cursorPosition + 1);
 
         if (Input.Keyboard.WasKeyJustPressed(Keys.Down)) currentLine++;
         else if (Input.Keyboard.WasKeyJustPressed(Keys.Up)) currentLine--;
 
-        if (Input.Keyboard.WasKeyJustPressed(Keys.Back) && cursorPositions > 0)
+        if (Input.Keyboard.WasKeyJustPressed(Keys.Back) && cursorPosition > 0)
         {
-            map[currentLine][cursorPositions - 1] = ' ';
-            cursorPositions--;
+            map[currentLine][cursorPosition - 1] = ' ';
+            cursorPosition--;
         }
-        else if (Input.Keyboard.IsKeyDown(Keys.Back) && cursorPositions > 0)
+        else if (Input.Keyboard.IsKeyDown(Keys.Back) && cursorPosition > 0)
         {
             waitBeforeFastErase += (float)gameTime.ElapsedGameTime.TotalSeconds;
             if(waitBeforeFastErase >= 0.5f)
@@ -82,13 +117,8 @@ public class Game1 : Core
                 eraseInterval += (float)gameTime.ElapsedGameTime.TotalSeconds;
                 if(eraseInterval >= 0.05f)
                 {
-                    for (int i = 0; i < completedBuildings.Count; i++)
-                    { //A looooooong way if
-                        if (currentLine == completedBuildings[i].StartLine + availableStructures[completedBuildings[i].StructureIndex].Lines.Length && cursorPositions == completedBuildings[i].StartColumn + availableStructures[completedBuildings[i].StructureIndex].Lines.Sum(line => line.Length))
-                            completedBuildings.Remove(completedBuildings[i]);
-                    }
-                    map[currentLine][cursorPositions - 1] = ' ';
-                    cursorPositions--;
+                    map[currentLine][cursorPosition - 1] = ' ';
+                    cursorPosition--;
                     eraseInterval = 0f;
                 }
             }
@@ -102,7 +132,7 @@ public class Game1 : Core
         if (Input.Mouse.WasButtonJustPressed(MouseButton.Left))
         {
             Vector2 mousePos = new Vector2(Input.Mouse.X, Input.Mouse.Y);
-            Vector2 basePosition = new Vector2(0, (GraphicsDevice.Viewport.Height / 2f) - maxLines * 15);
+            Vector2 basePosition = new Vector2(0, (Window.ClientBounds.Height / 2f) - (Window.ClientBounds.Height / 2f) / 2f - 160);
             int clickedLine = -1;
             float minDistanceY = float.MaxValue;
             for (int i = 0; i < map.Length; i++)
@@ -125,13 +155,13 @@ public class Game1 : Core
                 string lineText = map[currentLine].ToString();
                 if (string.IsNullOrEmpty(lineText))
                 {
-                    cursorPositions = 0;
+                    cursorPosition = 0;
                     return;
                 }
 
                 float linePosX = basePosition.X;
                 float localMouseX = mousePos.X - linePosX;
-                cursorPositions = GetCharIndexAtPosition(font, lineText, localMouseX);
+                cursorPosition = GetCharIndexAtPosition(font, lineText, localMouseX);
             }
         }
 
@@ -160,32 +190,37 @@ public class Game1 : Core
     {
         char character = args.Character;
         Keys pressedKey = args.Key;
-        if (args.Key != Keys.Back) //Stair
+        if (args.Key != Keys.Back)
         {
-            if (cursorPositions < maxCharacters)
+            if (cursorPosition < maxCharacters)
             {
-                if (cursorPositions < map[currentLine].Length)
+                if (cursorPosition < map[currentLine].Length)
                 {
-                    if (map[currentLine][cursorPositions + 1] != ' ')
+                    if (map[currentLine][cursorPosition] != ' ')
                     {
-                        for (int i = 0; i < map[currentLine].Length - cursorPositions; i++)
+                        for (int i = 0; i < map[currentLine].Length - cursorPosition; i++)
                         {
-                            if (map[currentLine][cursorPositions + i] != ' ') continue;
+                            if (map[currentLine][cursorPosition + i] != ' ') continue;
                             else
                             {
-                                map[currentLine].Remove(cursorPositions + i, 1);
-                                map[currentLine].Insert(cursorPositions, character);
+                                if(pushWhiteSpaces) map[currentLine].Remove(cursorPosition + i, 1);
+                                map[currentLine].Insert(cursorPosition, character);
+                                foreach (ColoredLines colored in coloredLines) 
+                                {
+                                    if(colored.StartLine == currentLine) colored.StartColumn++;
+                                }
                                 break;
                             }
                         }
                     }
-                    else if (map[currentLine][cursorPositions + 1] == ' ') map[currentLine][cursorPositions] = character;
+                    else map[currentLine][cursorPosition] = character;
                 }
+                else map[currentLine].Append(character);
                 cursorTimer = 0.5f;
-                cursorPositions++;
+                cursorPosition++;
             }
 
-            buildingSys.TryMatchStructures(character, activeMatches, availableStructures, completedBuildings, currentLine, cursorPositions);
+            buildingSys.TryMatchStructures(character, activeMatches, availableStructures, completedBuildings, currentLine, cursorPosition);
         }
     }
 
@@ -194,31 +229,27 @@ public class Game1 : Core
         GraphicsDevice.Clear(new Color(0.12f, 0.12f, 0.12f, 1f));
 
         SpriteBatch.Begin();
-        Vector2 basePosition = new Vector2(0, (GraphicsDevice.Viewport.Height / 2f) - maxLines * 15);
+        Vector2 basePosition = new Vector2(0, (Window.ClientBounds.Height / 2f) - (Window.ClientBounds.Height / 2f) / 2f - 160);
 
         for (int lineIndex = 0; lineIndex < map.Length; lineIndex++)
         {
             string lineText = map[lineIndex].ToString().TrimEnd();
             if (string.IsNullOrWhiteSpace(lineText)) lineText = " ";
-            Vector2 lineSize = font.MeasureString(lineText);
-            float posY = basePosition.Y - (lineSize.Y / 2f) + (lineIndex * font.LineSpacing);
-            Vector2 position = new Vector2(basePosition.X, posY);
-            SpriteBatch.DrawString(font, lineText, position, Color.White);
-            buildingSys.DrawBuildings(availableStructures, completedBuildings, lineText, lineIndex, basePosition, font, SpriteBatch);
+            
+            buildingSys.DrawLineWithBuildings(SpriteBatch, lineText, lineIndex, basePosition, font, availableStructures, completedBuildings, coloredLines, map);
         }
 
         if (cursorVisible)
         {
             string lineText = map[currentLine].ToString();
-            string leftPart = cursorPositions <= lineText.Length ? lineText.Substring(0, cursorPositions) : lineText;
+            string leftPart = cursorPosition <= lineText.Length ? lineText.Substring(0, cursorPosition) : lineText;
             Vector2 leftSize = font.MeasureString(leftPart);
             Vector2 cursorDrawPos = new Vector2(basePosition.X + leftSize.X, basePosition.Y - (font.LineSpacing / 2) + (currentLine * font.LineSpacing));
             SpriteBatch.DrawString(font, "|", cursorDrawPos, Color.White);
         }
-        //Debug info
-        SpriteBatch.DrawString(font, $"Line: {currentLine}  CursorPos: {cursorPositions}", new Vector2(10, 10), Color.Yellow);
-        SpriteBatch.DrawString(font, $"Buildings: {completedBuildings.Count}  ActiveMatches: {activeMatches.Count}", new Vector2(10, 40), Color.Yellow);
-        SpriteBatch.End(); //The end?
+        //SpriteBatch.DrawString(font, $"Line: {currentLine}  CursorPos: {cursorPosition}", new Vector2(10, 10), Color.Yellow);
+        SpriteBatch.DrawString(font, $"Buildings: {completedBuildings.Count}  ActiveMatches: {activeMatches.Count} ColoredText {coloredLines.Count}", new Vector2(10, 40), Color.Yellow);
+        SpriteBatch.End();
 
         base.Draw(gameTime);
     }

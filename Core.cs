@@ -6,7 +6,6 @@ using Microsoft.Xna.Framework.Input;
 using IDEOS.Input;
 
 namespace IDEOS;
-//I've taken this part from MonoGame framework geting started guide. Also i needed input system, so i've taken it too.
 public class Core : Game
 {
     internal static Core s_instance;

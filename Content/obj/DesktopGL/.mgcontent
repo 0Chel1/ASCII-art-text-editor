@@ -4,9 +4,11 @@
   <Platform>DesktopGL</Platform>
   <Config />
   <SourceFiles>
-    <File>C:/Users/Артур/source/repos/IDEOS/Content/MainFont.spritefont</File>
+    <File>C:/Users/Артур/Desktop/ASCII-art-text-editor/Content/ComicSans.spritefont</File>
+    <File>C:/Users/Артур/Desktop/ASCII-art-text-editor/Content/MainFont.spritefont</File>
   </SourceFiles>
   <DestFiles>
+    <File xsi:nil="true" />
     <File xsi:nil="true" />
   </DestFiles>
 </SourceFileCollection>

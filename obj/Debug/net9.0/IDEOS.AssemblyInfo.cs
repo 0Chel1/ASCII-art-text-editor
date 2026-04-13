@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("IDEOS")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+17db6f1c5657d62fbcf16aa65e5d9da2972e4da9")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f7feeec6bf22d76b414cc72dd46cb5a0ced2b369")]
 [assembly: System.Reflection.AssemblyProductAttribute("IDEOS")]
 [assembly: System.Reflection.AssemblyTitleAttribute("IDEOS")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
