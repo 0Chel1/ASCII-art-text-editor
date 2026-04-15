@@ -39,4 +39,13 @@ public class FilesManagement
             Debug.WriteLine("Ошибка при сохранении файла: " + ex.Message);
         }
     }
+
+    public string[] LoadFromFile()
+    {
+        string programFiles = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        string folderPath = Path.Combine(programFiles, "ASCII editor", "saves");
+        string filePath = Path.Combine(folderPath, "default.txt");
+        string[] a = File.ReadAllLines(filePath);
+        return a;
+    }
 }

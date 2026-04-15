@@ -1,13 +1,14 @@
 ﻿using IDEOS.Input;
 using IDEOS.Systems;
-using static IDEOS.Systems.BuildingSystem;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using static IDEOS.Systems.BuildingSystem;
 
 namespace IDEOS;
 
@@ -22,7 +23,8 @@ public class MainProg : Core
     public List<CompletedBuilding> completedBuildings = new List<CompletedBuilding>();
     public List<ColoredLines> coloredLines = new List<ColoredLines>();
     public BuildingSystem buildingSys = new BuildingSystem();
-    public bool cursorVisible = true, pushWhiteSpaces = false;
+    public FilesManagement fileManager = new FilesManagement();
+    public bool cursorVisible = true;
     float cursorTimer = 0f, waitBeforeFastErase = 0f, eraseInterval = 0f;
 
     public MainProg() : base("ASCII art editor", 1280, 720, false)
@@ -43,7 +45,50 @@ public class MainProg : Core
     {
         base.LoadContent();
         font = Content.Load<SpriteFont>("MainFont");
-        foreach (StringBuilder a in map) a.Clear().Append(' ', maxCharacters);
+        string programFiles = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        string filePath = Path.Combine(programFiles, "ASCII editor", "saves", "default.txt");
+        if (File.Exists(filePath))
+        {
+            string[] content = fileManager.LoadFromFile();
+            for (int i = 0; i < map.Length; i++)
+            {
+                map[i] = new StringBuilder(content[i]);
+            }
+
+            for (int i = map.Length; i < content.Length; i++)
+            {
+                var parts = content[i].Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                if (parts.Length < 7) continue;
+
+                string lineText = parts[0];
+
+                int ParseComponent(string token)
+                {
+                    var idx = token.IndexOf(':');
+                    var numStr = idx >= 0 ? token[(idx + 1)..] : token;
+                    return int.TryParse(numStr, out var v) ? v : 0;
+                }
+
+                int r = ParseComponent(parts[1]);
+                int g = ParseComponent(parts[2]);
+                int b = ParseComponent(parts[3]);
+
+                if (!int.TryParse(parts[5], out int startLine)) continue;
+                if (!int.TryParse(parts[6], out int startColumn)) continue;
+
+                coloredLines.Add(new ColoredLines
+                {
+                    Line = lineText,
+                    color = new Color(r, g, b),
+                    StartLine = startLine,
+                    StartColumn = startColumn
+                });
+            }
+        }
+        else
+        {
+            foreach (StringBuilder a in map) a.Append(' ', maxCharacters);
+        }
 
         availableStructures.Add(new Structure
         {
@@ -192,6 +237,17 @@ public class MainProg : Core
         Keys pressedKey = args.Key;
         if (args.Key != Keys.Back)
         {
+            int count = 0;
+            for(int i = 0;i < maxLines; i++)
+            {
+                for(int j = 0;j < map[i].Length - 1; j++)
+                {
+                    if (j > maxCharacters) count++;
+                }
+                map[i].Remove(maxCharacters, count);
+                count = 0;
+            }
+
             if (cursorPosition < maxCharacters)
             {
                 if (cursorPosition < map[currentLine].Length)
@@ -203,7 +259,7 @@ public class MainProg : Core
                             if (map[currentLine][cursorPosition + i] != ' ') continue;
                             else
                             {
-                                if(pushWhiteSpaces) map[currentLine].Remove(cursorPosition + i, 1);
+                                if(buildingSys.push) map[currentLine].Remove(cursorPosition + i, 1);
                                 map[currentLine].Insert(cursorPosition, character);
                                 foreach (ColoredLines colored in coloredLines) 
                                 {

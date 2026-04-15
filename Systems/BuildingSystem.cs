@@ -2,19 +2,15 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
-using static IDEOS.Systems.BuildingSystem;
-using static System.Net.Mime.MediaTypeNames;
+using static Program;
 namespace IDEOS.Systems;
 
 public class BuildingSystem
 {
-    private readonly MainProg game;
+    public bool push = false;
     /// <summary>
     /// Try to currentMatch char on the current cursor position on the current line with Structure lists every structures first char in their first line.
     /// </summary>
@@ -28,49 +24,49 @@ public class BuildingSystem
     {
         if (activeMatches.Count > 0)
         {
-            var match = activeMatches[0];
-            var structure = availableStructures[match.StructureIndex];
-
-            bool isCorrectPosition = currentLine == match.StartMapLine + match.CurrentLineInStructure && cursorPositions == match.StartCursorPos + 1 + match.CharsCountInLine;
-
-            if (!isCorrectPosition)
+            for (int i = activeMatches.Count - 1; i >= 0; i--)
             {
-                activeMatches.Clear();
-                TryStartNewMatch(character, activeMatches, availableStructures, currentLine, cursorPositions);
-                return;
-            }
+                var match = activeMatches[i];
+                var structure = availableStructures[match.StructureIndex];
 
-            string currentLineInStruct = structure.Lines[match.CurrentLineInStructure];
+                bool isCorrectPosition = currentLine == match.StartMapLine + match.CurrentLineInStructure && cursorPositions == match.StartCursorPos + 1 + match.CharsCountInLine;
 
-            if (match.CharsCountInLine < currentLineInStruct.Length && character == currentLineInStruct[match.CharsCountInLine])
-            {
-                match.CharsCount++;
-                match.CharsCountInLine++;
-
-                if (match.CharsCountInLine == currentLineInStruct.Length)
+                if (!isCorrectPosition)
                 {
-                    match.CharsCountInLine = 0;
-                    match.CurrentLineInStructure++;
+                    activeMatches.RemoveAt(i);
+                    continue;
+                }
 
-                    if (match.CurrentLineInStructure == structure.Lines.Length)
+                string currentLineInStruct = structure.Lines[match.CurrentLineInStructure];
+
+                if (match.CharsCountInLine < currentLineInStruct.Length && character == currentLineInStruct[match.CharsCountInLine])
+                {
+                    match.CharsCount++;
+                    match.CharsCountInLine++;
+
+                    if (match.CharsCountInLine == currentLineInStruct.Length)
                     {
-                        completedBuildings.Add(new CompletedBuilding
-                        {
-                            StructureIndex = match.StructureIndex,
-                            StartLine = match.StartMapLine,
-                            StartColumn = match.StartCursorPos
-                        });
+                        match.CharsCountInLine = 0;
+                        match.CurrentLineInStructure++;
 
-                        activeMatches.Clear();
+                        if (match.CurrentLineInStructure == structure.Lines.Length)
+                        {
+                            completedBuildings.Add(new CompletedBuilding
+                            {
+                                StructureIndex = match.StructureIndex,
+                                StartLine = match.StartMapLine,
+                                StartColumn = match.StartCursorPos
+                            });
+
+                            activeMatches.RemoveAt(i);
+                        }
                     }
                 }
+                else
+                {
+                    activeMatches.RemoveAt(i);
+                }
             }
-            else
-            {
-                activeMatches.Clear();
-                TryStartNewMatch(character, activeMatches, availableStructures, currentLine, cursorPositions);
-            }
-            return;
         }
         TryStartNewMatch(character, activeMatches, availableStructures, currentLine, cursorPositions);
     }
@@ -83,37 +79,17 @@ public class BuildingSystem
             if (lines.Length == 0 || lines[0].Length == 0) continue;
 
             string command = lines[0];
-            if (command.StartsWith("."))
+            if (character == command[0])
             {
-                if (character == command[0])
+                activeMatches.Add(new ActiveMatch
                 {
-                    activeMatches.Add(new ActiveMatch
-                    {
-                        StructureIndex = i,
-                        CurrentLineInStructure = 0,
-                        StartCursorPos = cursorPositions - 1,
-                        StartMapLine = currentLine,
-                        CharsCount = 1,
-                        CharsCountInLine = 1
-                    });
-                    return;
-                }
-            }
-            else
-            {
-                if (character == command[0])
-                {
-                    activeMatches.Add(new ActiveMatch
-                    {
-                        StructureIndex = i,
-                        CurrentLineInStructure = 0,
-                        StartCursorPos = cursorPositions - 1,
-                        StartMapLine = currentLine,
-                        CharsCount = 1,
-                        CharsCountInLine = 1
-                    });
-                    return;
-                }
+                    StructureIndex = i,
+                    CurrentLineInStructure = 0,
+                    StartCursorPos = cursorPositions - 1,
+                    StartMapLine = currentLine,
+                    CharsCount = 1,
+                    CharsCountInLine = 1
+                });
             }
         }
     }
@@ -151,12 +127,12 @@ public class BuildingSystem
         {
             var structure = availableStructures[building.StructureIndex];
             int startColumn = building.StartColumn;
-            if (structure.Lines.Length > 0 && structure.Lines[0] == ".pushWhiteSpaces")
+            if (structure.Lines.Length > 0 && structure.Lines[0] == ".push")
             {
-                if (game.pushWhiteSpaces) game.pushWhiteSpaces = false;
-                else game.pushWhiteSpaces = true;
-                string fullLine = map[building.StartLine].ToString();
-                map[building.StartLine].Replace(fullLine.Substring(startColumn, 11).ToString(), "", startColumn, 11);
+                if (push) push = false;
+                else push = true;
+                map[building.StartLine].Replace(map[building.StartLine].ToString().Substring(startColumn, 5).ToString(), "     ", startColumn, 5);
+                completedBuildings.Remove(building);
                 continue;
             }
 
@@ -220,14 +196,23 @@ public class BuildingSystem
             }
             else if(structure.Lines.Length > 0 && structure.Lines[0].StartsWith(".s"))
             {
-                map[building.StartLine].Replace(map[building.StartLine].ToString().Substring(startColumn, 2).ToString(), "", startColumn, 2);
+                map[building.StartLine].Replace(map[building.StartLine].ToString().Substring(startColumn, 2).ToString(), "  ", startColumn, 2);
                 FilesManagement fileManager = new FilesManagement();
                 string content = "";
                 foreach(var line in map)
                 {
                     content += line.ToString() + "\n";
                 }
+
+                for(int i = 0;i < coloredLines.Count; i++)
+                {
+                    if(i < coloredLines.Count - 1) content += $"{coloredLines[i].Line} {coloredLines[i].color} {coloredLines[i].StartLine} {coloredLines[i].StartColumn}\n";
+                    else content += $"{coloredLines[i].Line} {coloredLines[i].color} {coloredLines[i].StartLine} {coloredLines[i].StartColumn}";
+                }
                 fileManager.SaveToFile(content, false);
+                map[building.StartLine].Replace(map[building.StartLine].ToString().Substring(startColumn, 5).ToString(), "", startColumn, 5);
+                completedBuildings.Remove(building);
+                continue;
             }
 
             if (startColumn > currentCol)
