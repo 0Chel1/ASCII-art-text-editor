@@ -23,12 +23,12 @@ public class FilesManagement
 
             if (append)
             {
-                // Добавляем текст в конец файла (не перезаписывая)
+                //Adds text in the end of the file(does not rewrite the file).
                 File.AppendAllText(filePath, content + Environment.NewLine);
             }
             else
             {
-                // Перезаписываем файл полностью
+                //Fully rewrite the file
                 File.WriteAllText(filePath, content);
             }
 

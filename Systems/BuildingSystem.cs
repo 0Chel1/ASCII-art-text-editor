@@ -11,17 +11,10 @@ namespace IDEOS.Systems;
 public class BuildingSystem
 {
     public bool push = false;
-    /// <summary>
-    /// Try to currentMatch char on the current cursor position on the current line with Structure lists every structures first char in their first line.
-    /// </summary>
-    /// <param name="character"></param>
-    /// <param name="activeMatches"></param>
-    /// <param name="availableStructures"></param>
-    /// <param name="completedBuildings"></param>
-    /// <param name="currentLine"></param>
-    /// <param name="cursorPositions"></param>
-    public void TryMatchStructures(char character, List<ActiveMatch> activeMatches, List<Structure> availableStructures, List<CompletedBuilding> completedBuildings, int currentLine, int cursorPositions)
-    {
+    //This method makes a mathes if the current character siquence matches with the structure.
+    //If the siquence fully mathes the structure it will create the building.
+    public void TryMatchStructures(char character, List<ActiveMatch> activeMatches, List<Structure> availableStructures, List<CompletedBuilding> completedBuildings, 
+                                   int currentLine, int cursorPositions) {
         if (activeMatches.Count > 0)
         {
             for (int i = activeMatches.Count - 1; i >= 0; i--)
@@ -29,7 +22,8 @@ public class BuildingSystem
                 var match = activeMatches[i];
                 var structure = availableStructures[match.StructureIndex];
 
-                bool isCorrectPosition = currentLine == match.StartMapLine + match.CurrentLineInStructure && cursorPositions == match.StartCursorPos + 1 + match.CharsCountInLine;
+                bool isCorrectPosition = currentLine == match.StartMapLine + match.CurrentLineInStructure && 
+                     cursorPositions == match.StartCursorPos + 1 + match.CharsCountInLine;
 
                 if (!isCorrectPosition)
                 {
@@ -70,7 +64,7 @@ public class BuildingSystem
         }
         TryStartNewMatch(character, activeMatches, availableStructures, currentLine, cursorPositions);
     }
-
+    //This method checks if the current character can start a new match for any structure. If it can it will add a new active match to the list.
     private void TryStartNewMatch(char character, List<ActiveMatch> activeMatches, List<Structure> availableStructures, int currentLine, int cursorPositions)
     {
         for (int i = 0; i < availableStructures.Count; i++)
@@ -93,31 +87,21 @@ public class BuildingSystem
             }
         }
     }
-
-    /// <summary>
-    /// Draws buildings from completedBuildings list.
-    /// </summary>
-    /// <param name="spriteBatch"></param>
-    /// <param name="lineText"></param>
-    /// <param name="lineIndex"></param>
-    /// <param name="basePosition"></param>
-    /// <param name="mainFont"></param>
-    /// <param name="availableStructures"></param>
-    /// <param name="completedBuildings"></param>
-    public void DrawLineWithBuildings(SpriteBatch spriteBatch, string lineText, int lineIndex, Vector2 basePosition, SpriteFont mainFont, List<Structure> availableStructures, List<CompletedBuilding> completedBuildings, List<ColoredLines> coloredLines, StringBuilder[] map)
-    {
+    //Draws text lines. Can color them and change the font.
+    public void DrawLineWithBuildings(SpriteBatch spriteBatch, string lineText, int lineIndex, Vector2 basePosition, SpriteFont mainFont, 
+        List<Structure> availableStructures, List<CompletedBuilding> completedBuildings, List<ColoredLines> coloredLines, StringBuilder[] map) {
         if (string.IsNullOrEmpty(lineText)) return;
 
         float currentX = basePosition.X;
         float posY = basePosition.Y - (mainFont.MeasureString(" ").Y / 2f) + (lineIndex * mainFont.LineSpacing);
-
+        //buildingsOnLine will contain all the buildings that should be drawn on the current line.
+        //We filter them by checking if their structure index is valid and if the line index is within the range of the building's start line and its height in lines.
         var buildingsOnLine = completedBuildings.Where(b => b.StructureIndex >= 0 && b.StructureIndex < availableStructures.Count)
             .Where(b =>
             {
                 var s = availableStructures[b.StructureIndex];
                 return lineIndex >= b.StartLine && lineIndex < b.StartLine + s.HeightInLines;
-            })
-            .OrderBy(b => b.StartColumn).ToList();
+            }).OrderBy(b => b.StartColumn).ToList();
 
         var coloredOnThisLine = coloredLines.Where(cl => cl.StartLine == lineIndex).OrderBy(cl => cl.StartColumn).ToList();
 
@@ -127,6 +111,7 @@ public class BuildingSystem
         {
             var structure = availableStructures[building.StructureIndex];
             int startColumn = building.StartColumn;
+            //pushing command logic. Change text pushing method. 
             if (structure.Lines.Length > 0 && structure.Lines[0] == ".push")
             {
                 if (push) push = false;
@@ -135,7 +120,8 @@ public class BuildingSystem
                 completedBuildings.Remove(building);
                 continue;
             }
-
+            //coloring command logic. It checks if the line starts with .c and if it does it tries to make a colored line by checking if color typed in hex and the lenght after that.
+            //Also it will color in the direction in whic the spliter in the end is facing.
             if (structure.Lines.Length > 0 && structure.Lines[0].StartsWith(".c"))
             {
                 string fullLine = map[building.StartLine].ToString();
@@ -150,7 +136,8 @@ public class BuildingSystem
                     if (int.TryParse(r, NumberStyles.HexNumber, null, out int red) && r.Any(c => c != '>' || c != '<') &&
                         int.TryParse(g, NumberStyles.HexNumber, null, out int green) && g.Any(c => c != '>' || c != '<') &&
                         int.TryParse(b, NumberStyles.HexNumber, null, out int blue) && b.Any(c => c != '>' || c != '<') &&
-                        int.TryParse(lenStr, out int lengthToColor) && lenStr.Any(c => c != '>' || c != '<')){
+                        int.TryParse(lenStr, out int lengthToColor) && lenStr.Any(c => c != '>' || c != '<')) {
+
                         int textStartPos = startColumn + 11;
 
                         if (textStartPos + lengthToColor <= fullLine.Length)
@@ -159,9 +146,8 @@ public class BuildingSystem
                             {
                                 map[building.StartLine].Replace(fullLine.Substring(startColumn, 11).ToString(), "", startColumn, 11);
                                 foreach (ColoredLines colored in coloredLines)
-                                {
                                     if (colored.StartLine == building.StartLine) colored.StartColumn = startColumn + lengthToColor;
-                                }
+
                                 string coloredText = fullLine.Substring(textStartPos, lengthToColor);
                                 int newIndex = availableStructures.Count;
 
@@ -194,7 +180,8 @@ public class BuildingSystem
                 }
                 continue;
             }
-            else if(structure.Lines.Length > 0 && structure.Lines[0].StartsWith(".s"))
+            //saving command logic. 
+            else if (structure.Lines.Length > 0 && structure.Lines[0].StartsWith(".s"))
             {
                 map[building.StartLine].Replace(map[building.StartLine].ToString().Substring(startColumn, 2).ToString(), "  ", startColumn, 2);
                 FilesManagement fileManager = new FilesManagement();
@@ -206,7 +193,8 @@ public class BuildingSystem
 
                 for(int i = 0;i < coloredLines.Count; i++)
                 {
-                    if(i < coloredLines.Count - 1) content += $"{coloredLines[i].Line} {coloredLines[i].color} {coloredLines[i].StartLine} {coloredLines[i].StartColumn}\n";
+                    if(i < coloredLines.Count - 1)
+                        content += $"{coloredLines[i].Line} {coloredLines[i].color} {coloredLines[i].StartLine} {coloredLines[i].StartColumn}\n";
                     else content += $"{coloredLines[i].Line} {coloredLines[i].color} {coloredLines[i].StartLine} {coloredLines[i].StartColumn}";
                 }
                 fileManager.SaveToFile(content, false);
@@ -214,7 +202,7 @@ public class BuildingSystem
                 completedBuildings.Remove(building);
                 continue;
             }
-
+            //regular text drawing.
             if (startColumn > currentCol)
             {
                 int safeLength = Math.Min(startColumn - currentCol, lineText.Length - currentCol);
@@ -245,7 +233,7 @@ public class BuildingSystem
                 }
             }
         }
-
+        //Draw colored lines.
         foreach (var colored in coloredOnThisLine)
         {
             int startColumn = colored.StartColumn;

@@ -301,9 +301,9 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Артур\\Desktop\\ASCII-art-text-editor\\IDEOS.csproj",
-      "projectName": "IDEOS",
-      "projectPath": "C:\\Users\\Артур\\Desktop\\ASCII-art-text-editor\\IDEOS.csproj",
+      "projectUniqueName": "C:\\Users\\Артур\\Desktop\\ASCII-art-text-editor\\ASCII art editor.csproj",
+      "projectName": "ASCII art editor",
+      "projectPath": "C:\\Users\\Артур\\Desktop\\ASCII-art-text-editor\\ASCII art editor.csproj",
       "packagesPath": "C:\\Users\\Артур\\.nuget\\packages\\",
       "outputPath": "C:\\Users\\Артур\\Desktop\\ASCII-art-text-editor\\obj\\",
       "projectStyle": "PackageReference",
@@ -369,7 +369,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.312/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.313/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

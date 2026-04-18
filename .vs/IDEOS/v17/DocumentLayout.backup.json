@@ -3,20 +3,8 @@
   "WorkspaceRootPath": "C:\\Users\\\u0410\u0440\u0442\u0443\u0440\\Desktop\\ASCII-art-text-editor\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{AB9264C3-4255-4683-92AE-F07AF36491E8}|IDEOS.csproj|c:\\users\\\u0430\u0440\u0442\u0443\u0440\\desktop\\ascii-art-text-editor\\mainprog.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{AB9264C3-4255-4683-92AE-F07AF36491E8}|IDEOS.csproj|solutionrelative:mainprog.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{AB9264C3-4255-4683-92AE-F07AF36491E8}|IDEOS.csproj|c:\\users\\\u0430\u0440\u0442\u0443\u0440\\desktop\\ascii-art-text-editor\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{AB9264C3-4255-4683-92AE-F07AF36491E8}|IDEOS.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{AB9264C3-4255-4683-92AE-F07AF36491E8}|IDEOS.csproj|c:\\users\\\u0430\u0440\u0442\u0443\u0440\\desktop\\ascii-art-text-editor\\systems\\buildingsystem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{AB9264C3-4255-4683-92AE-F07AF36491E8}|IDEOS.csproj|solutionrelative:systems\\buildingsystem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{AB9264C3-4255-4683-92AE-F07AF36491E8}|IDEOS.csproj|c:\\users\\\u0430\u0440\u0442\u0443\u0440\\desktop\\ascii-art-text-editor\\systems\\filesmanagement.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{AB9264C3-4255-4683-92AE-F07AF36491E8}|IDEOS.csproj|solutionrelative:systems\\filesmanagement.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{AB9264C3-4255-4683-92AE-F07AF36491E8}|ASCII art editor.csproj|c:\\users\\\u0430\u0440\u0442\u0443\u0440\\desktop\\ascii-art-text-editor\\mainprog.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{AB9264C3-4255-4683-92AE-F07AF36491E8}|ASCII art editor.csproj|solutionrelative:mainprog.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -26,7 +14,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 5,
+          "SelectedChildIndex": 2,
           "Children": [
             {
               "$type": "Bookmark",
@@ -38,52 +26,13 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "Program.cs",
-              "DocumentMoniker": "C:\\Users\\\u0410\u0440\u0442\u0443\u0440\\Desktop\\ASCII-art-text-editor\\Program.cs",
-              "RelativeDocumentMoniker": "Program.cs",
-              "ToolTip": "C:\\Users\\\u0410\u0440\u0442\u0443\u0440\\Desktop\\ASCII-art-text-editor\\Program.cs",
-              "RelativeToolTip": "Program.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-15T10:39:12.139Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "FilesManagement.cs",
-              "DocumentMoniker": "C:\\Users\\\u0410\u0440\u0442\u0443\u0440\\Desktop\\ASCII-art-text-editor\\Systems\\FilesManagement.cs",
-              "RelativeDocumentMoniker": "Systems\\FilesManagement.cs",
-              "ToolTip": "C:\\Users\\\u0410\u0440\u0442\u0443\u0440\\Desktop\\ASCII-art-text-editor\\Systems\\FilesManagement.cs",
-              "RelativeToolTip": "Systems\\FilesManagement.cs",
-              "ViewState": "AgIAAA0AAAAAAAAAAAAQwBIAAAAaAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-14T07:03:59.267Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "BuildingSystem.cs",
-              "DocumentMoniker": "C:\\Users\\\u0410\u0440\u0442\u0443\u0440\\Desktop\\ASCII-art-text-editor\\Systems\\BuildingSystem.cs",
-              "RelativeDocumentMoniker": "Systems\\BuildingSystem.cs",
-              "ToolTip": "C:\\Users\\\u0410\u0440\u0442\u0443\u0440\\Desktop\\ASCII-art-text-editor\\Systems\\BuildingSystem.cs",
-              "RelativeToolTip": "Systems\\BuildingSystem.cs",
-              "ViewState": "AgIAAE4AAAAAAAAAAAAYwNAAAAAxAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-05T12:42:29.69Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
               "DocumentIndex": 0,
               "Title": "MainProg.cs",
               "DocumentMoniker": "C:\\Users\\\u0410\u0440\u0442\u0443\u0440\\Desktop\\ASCII-art-text-editor\\MainProg.cs",
               "RelativeDocumentMoniker": "MainProg.cs",
               "ToolTip": "C:\\Users\\\u0410\u0440\u0442\u0443\u0440\\Desktop\\ASCII-art-text-editor\\MainProg.cs",
               "RelativeToolTip": "MainProg.cs",
-              "ViewState": "AgIAAAkAAAAAAAAAAAAAADkAAAAjAAAAAAAAAA==",
+              "ViewState": "AgIAACcAAAAAAAAAAAAYwFkAAAA4AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-03-28T14:29:59.408Z",
               "EditorCaption": ""

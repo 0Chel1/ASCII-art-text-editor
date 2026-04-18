@@ -15,19 +15,25 @@ namespace IDEOS;
 public class MainProg : Core
 {
     private SpriteFont font;
-    public int currentLine = 0, maxLines = 22, maxCharacters = 91;
-    int cursorPosition = 0;
-    StringBuilder[] map;
+    public int maxLines = 27, maxCharacters = 117;
+    int Yoffset = 415;
+    int cursorPosition = 0, currentLine = 0;
+
+    //Lists
+    StringBuilder[] map; //map of the characters
     public List<Structure> availableStructures = new List<Structure>();
     public List<ActiveMatch> activeMatches = new List<ActiveMatch>();
     public List<CompletedBuilding> completedBuildings = new List<CompletedBuilding>();
     public List<ColoredLines> coloredLines = new List<ColoredLines>();
+
+
     public BuildingSystem buildingSys = new BuildingSystem();
     public FilesManagement fileManager = new FilesManagement();
-    public bool cursorVisible = true;
-    float cursorTimer = 0f, waitBeforeFastErase = 0f, eraseInterval = 0f;
 
-    public MainProg() : base("ASCII art editor", 1280, 720, false)
+    public bool cursorVisible = true;
+    float cursorTimer = 0f, waitBeforeFastErase = 0f, eraseInterval = 0f; //text cursor blinking
+
+    public MainProg() : base("ASCII art editor", 1640, 860, false)
     {
         IsMouseVisible = true;
         Window.TextInput += TextInputHandler;
@@ -50,14 +56,13 @@ public class MainProg : Core
         if (File.Exists(filePath))
         {
             string[] content = fileManager.LoadFromFile();
-            for (int i = 0; i < map.Length; i++)
-            {
-                map[i] = new StringBuilder(content[i]);
-            }
+
+            for (int i = 0; i < map.Length; i++) map[i] = new StringBuilder(content[i]);
 
             for (int i = map.Length; i < content.Length; i++)
             {
                 var parts = content[i].Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
                 if (parts.Length < 7) continue;
 
                 string lineText = parts[0];
@@ -85,25 +90,13 @@ public class MainProg : Core
                 });
             }
         }
-        else
-        {
-            foreach (StringBuilder a in map) a.Append(' ', maxCharacters);
-        }
+        else foreach (StringBuilder a in map) a.Append(' ', maxCharacters); //if file default.txt doesn't exist, fill the map with empty spaces
 
-        availableStructures.Add(new Structure
-        {
-            Lines = new[] { ".c" }
-        });
+        availableStructures.Add(new Structure { Lines = new[] { ".c" } }); //color the line of text
 
-        availableStructures.Add(new Structure
-        {
-            Lines = new[] { ".push" }
-        });
+        availableStructures.Add(new Structure { Lines = new[] { ".push" } }); //change text pushing method
 
-        availableStructures.Add(new Structure
-        {
-            Lines = new[] { ".s" }
-        });
+        availableStructures.Add(new Structure { Lines = new[] { ".s" } }); //save everything to file
 
         availableStructures.Add(new Structure
         {
@@ -143,12 +136,13 @@ public class MainProg : Core
             }
             cursorTimer = 0f;
         }
+        //moves text cursor to the left or right
         if (Input.Keyboard.WasKeyJustPressed(Keys.Left)) cursorPosition = Math.Max(0, cursorPosition - 1);
         if (Input.Keyboard.WasKeyJustPressed(Keys.Right)) cursorPosition = Math.Min(map[currentLine].Length, cursorPosition + 1);
-
+        //moves text cursor up or down
         if (Input.Keyboard.WasKeyJustPressed(Keys.Down)) currentLine++;
         else if (Input.Keyboard.WasKeyJustPressed(Keys.Up)) currentLine--;
-
+        //erase characters. If being held, it will earse them faster
         if (Input.Keyboard.WasKeyJustPressed(Keys.Back) && cursorPosition > 0)
         {
             map[currentLine][cursorPosition - 1] = ' ';
@@ -173,11 +167,11 @@ public class MainProg : Core
             waitBeforeFastErase = 0f;
             eraseInterval = 0f;
         }
-
+        //places text cursor where the mouse clicks
         if (Input.Mouse.WasButtonJustPressed(MouseButton.Left))
         {
             Vector2 mousePos = new Vector2(Input.Mouse.X, Input.Mouse.Y);
-            Vector2 basePosition = new Vector2(0, (Window.ClientBounds.Height / 2f) - (Window.ClientBounds.Height / 2f) / 2f - 160);
+            Vector2 basePosition = new Vector2(0, (Window.ClientBounds.Height / 2f) - Yoffset);
             int clickedLine = -1;
             float minDistanceY = float.MaxValue;
             for (int i = 0; i < map.Length; i++)
@@ -261,10 +255,8 @@ public class MainProg : Core
                             {
                                 if(buildingSys.push) map[currentLine].Remove(cursorPosition + i, 1);
                                 map[currentLine].Insert(cursorPosition, character);
-                                foreach (ColoredLines colored in coloredLines) 
-                                {
-                                    if(colored.StartLine == currentLine) colored.StartColumn++;
-                                }
+                                foreach (ColoredLines colored in coloredLines)
+                                    if (colored.StartLine == currentLine) colored.StartColumn++;
                                 break;
                             }
                         }
@@ -275,7 +267,7 @@ public class MainProg : Core
                 cursorTimer = 0.5f;
                 cursorPosition++;
             }
-
+            //matching system from BuildingSystem.cs.
             buildingSys.TryMatchStructures(character, activeMatches, availableStructures, completedBuildings, currentLine, cursorPosition);
         }
     }
@@ -285,7 +277,7 @@ public class MainProg : Core
         GraphicsDevice.Clear(new Color(0.12f, 0.12f, 0.12f, 1f));
 
         SpriteBatch.Begin();
-        Vector2 basePosition = new Vector2(0, (Window.ClientBounds.Height / 2f) - (Window.ClientBounds.Height / 2f) / 2f - 160);
+        Vector2 basePosition = new Vector2(0, (Window.ClientBounds.Height / 2f) - Yoffset);
 
         for (int lineIndex = 0; lineIndex < map.Length; lineIndex++)
         {
@@ -303,8 +295,9 @@ public class MainProg : Core
             Vector2 cursorDrawPos = new Vector2(basePosition.X + leftSize.X, basePosition.Y - (font.LineSpacing / 2) + (currentLine * font.LineSpacing));
             SpriteBatch.DrawString(font, "|", cursorDrawPos, Color.White);
         }
+        //Debug info V
         //SpriteBatch.DrawString(font, $"Line: {currentLine}  CursorPos: {cursorPosition}", new Vector2(10, 10), Color.Yellow);
-        SpriteBatch.DrawString(font, $"Buildings: {completedBuildings.Count}  ActiveMatches: {activeMatches.Count} ColoredText {coloredLines.Count}", new Vector2(10, 40), Color.Yellow);
+        //SpriteBatch.DrawString(font, $"Buildings: {completedBuildings.Count}  ActiveMatches: {activeMatches.Count} ColoredText {coloredLines.Count}", new Vector2(10, 40), Color.Yellow);
         SpriteBatch.End();
 
         base.Draw(gameTime);
