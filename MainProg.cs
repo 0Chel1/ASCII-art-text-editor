@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -32,6 +33,7 @@ public class MainProg : Core
 
     public bool cursorVisible = true;
     float cursorTimer = 0f, waitBeforeFastErase = 0f, eraseInterval = 0f; //text cursor blinking
+    float Timer = 0f;
 
     public MainProg() : base("ASCII art editor", 1640, 860, false)
     {
@@ -116,10 +118,10 @@ public class MainProg : Core
     protected override void Update(GameTime gameTime)
     {
         cursorTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
-        if (cursorTimer >= 0.5f)
+        Timer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+        if(Timer >= 0.5f)
         {
-            cursorVisible = !cursorVisible;
-            foreach(var building in completedBuildings.ToList())
+            foreach (var building in completedBuildings.ToList())
             {
                 if (map[building.StartLine].ToString().Substring(building.StartColumn, availableStructures[building.StructureIndex].Lines[0].Length).All(c => char.IsWhiteSpace(c)))
                 {
@@ -127,13 +129,19 @@ public class MainProg : Core
                 }
             }
 
-            for(int i = 0; i < coloredLines.Count; i++)
+            for (int i = 0; i < coloredLines.Count; i++)
             {
                 if (map[coloredLines[i].StartLine].ToString().Substring(coloredLines[i].StartColumn, coloredLines[i].Line.Length).All(c => char.IsWhiteSpace(c)))
                 {
                     coloredLines.Remove(coloredLines[i]);
                 }
             }
+            Timer = 0f;
+        }
+        //Cursor blinking
+        if (cursorTimer >= 0.5f)
+        {
+            cursorVisible = !cursorVisible;
             cursorTimer = 0f;
         }
         //moves text cursor to the left or right
@@ -231,17 +239,6 @@ public class MainProg : Core
         Keys pressedKey = args.Key;
         if (args.Key != Keys.Back)
         {
-            int count = 0;
-            for(int i = 0;i < maxLines; i++)
-            {
-                for(int j = 0;j < map[i].Length - 1; j++)
-                {
-                    if (j > maxCharacters) count++;
-                }
-                map[i].Remove(maxCharacters, count);
-                count = 0;
-            }
-
             if (cursorPosition < maxCharacters)
             {
                 if (cursorPosition < map[currentLine].Length)
@@ -263,7 +260,6 @@ public class MainProg : Core
                     }
                     else map[currentLine][cursorPosition] = character;
                 }
-                else map[currentLine].Append(character);
                 cursorTimer = 0.5f;
                 cursorPosition++;
             }
@@ -295,7 +291,7 @@ public class MainProg : Core
             Vector2 cursorDrawPos = new Vector2(basePosition.X + leftSize.X, basePosition.Y - (font.LineSpacing / 2) + (currentLine * font.LineSpacing));
             SpriteBatch.DrawString(font, "|", cursorDrawPos, Color.White);
         }
-        //Debug info V
+        //Debug info
         //SpriteBatch.DrawString(font, $"Line: {currentLine}  CursorPos: {cursorPosition}", new Vector2(10, 10), Color.Yellow);
         //SpriteBatch.DrawString(font, $"Buildings: {completedBuildings.Count}  ActiveMatches: {activeMatches.Count} ColoredText {coloredLines.Count}", new Vector2(10, 40), Color.Yellow);
         SpriteBatch.End();
